@@ -1,9 +1,56 @@
 import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma";
 import { verifyPassword } from "../utils/helper";
 import { hashPassword } from "../utils/helper";
 import { AppError } from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
+
+interface User {
+  email: string;
+  password: string;
+  id: string;
+}
+
+function signToken(id: string): string {
+  const secret = process.env.JWT_SECRET;
+  const expiresIn = process.env.JWT_EXPIRES_IN;
+
+  if (!secret || !expiresIn) {
+    throw new Error("JWT_SECRET or JWT_EXPIRES_IN not defined in environment");
+  }
+
+  return jwt.sign({ id }, secret, {
+    expiresIn: parseInt(expiresIn, 10),
+  });
+}
+
+const createSendToken = (user: User, statusCode: number, res: Response) => {
+  const token = signToken(user.id);
+
+  const cookieExpiresIn = Number(process.env.JWT_COOKIE_EXPIRES_IN);
+  const cookieOptions = {
+    expires: new Date(Date.now() + cookieExpiresIn * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    sameSite: "none" as const,
+    secure: process.env.NODE_ENV === "production",
+  };
+
+  res.cookie("jwt", token, cookieOptions);
+
+  user.password = "prevent password from leaking";
+
+  const message =
+    statusCode === 201
+      ? "Account created successfully"
+      : "You are logged in successfully";
+  res.status(statusCode).json({
+    status: "success",
+    message,
+    token,
+    user,
+  });
+};
 
 export const loginUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -21,10 +68,7 @@ export const loginUser = catchAsync(
       return;
     }
 
-    res.status(200).json({
-      status: "success",
-      message: "You are logged in successfully",
-    });
+    createSendToken(user, 200, res);
   }
 );
 
@@ -48,6 +92,6 @@ export const signUpUser = catchAsync(
       data: { email, password: hashedPassword },
     });
 
-    res.status(201).json({ user });
+    createSendToken(user, 201, res);
   }
 );
