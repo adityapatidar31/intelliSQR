@@ -24,4 +24,6 @@ app.get("/", (_req, res) => {
 
 app.use("/api/v1/users", userRouter);
 
+// global Error Handler
+// app.use(globalErrorHandler);
 export default app;
