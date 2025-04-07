@@ -2,7 +2,13 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils"; // ShadCN utility to handle class merging
 import ThemeSwitcher from "./ThemeSwitcher";
 
-const Navbar = () => {
+const Navbar = ({
+  theme,
+  setTheme,
+}: {
+  theme: "light" | "dark";
+  setTheme: React.Dispatch<React.SetStateAction<"light" | "dark">>;
+}) => {
   const location = useLocation();
 
   const navItems = [
@@ -35,7 +41,7 @@ const Navbar = () => {
               {label}
             </Link>
           ))}
-          <ThemeSwitcher />
+          <ThemeSwitcher setTheme={setTheme} theme={theme} />
         </div>
       </div>
     </nav>
