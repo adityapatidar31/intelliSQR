@@ -1,15 +1,17 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { verifyPassword } from "../utils/helper";
 import { hashPassword } from "../utils/helper";
+import { AppError } from "../utils/appError";
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    res.status(400).json({
-      status: "error",
-      message: "Please Provide the Email and Password",
-    });
+    next(new AppError("Please Provide the Email and Password", 400));
     return;
   }
   const user = await prisma.user.findUnique({
@@ -17,10 +19,7 @@ export const loginUser = async (req: Request, res: Response) => {
   });
 
   if (!user || !(await verifyPassword(password, user.password))) {
-    res.status(400).json({
-      status: "error",
-      message: "Invalid Credentials",
-    });
+    next(new AppError("Invalid Credentials", 400));
     return;
   }
 
@@ -30,7 +29,11 @@ export const loginUser = async (req: Request, res: Response) => {
   });
 };
 
-export const signUpUser = async (req: Request, res: Response) => {
+export const signUpUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   console.log(req.body);
   const { email, password } = req.body;
 
@@ -40,10 +43,7 @@ export const signUpUser = async (req: Request, res: Response) => {
   });
 
   if (existingUser) {
-    res.status(401).json({
-      status: "error",
-      message: "user already exist",
-    });
+    next(new AppError("User already exist", 400));
     return;
   }
 

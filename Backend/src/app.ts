@@ -2,8 +2,7 @@ import express from "express";
 import morgan from "morgan";
 
 import userRouter from "./routes/userRoutes";
-// import AppError from "./utils/appError";
-// import globalErrorHandler from "./controllers/globalErrorHandler";
+import { globalErrorHandler } from "./utils/globalErrorHandler";
 
 const app = express();
 
@@ -26,11 +25,7 @@ app.get("/", (_req, res) => {
 
 app.use("/api/v1/users", userRouter);
 
-// app.all("*", (req, res, next) => {
-//   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
-// });
-
 // global Error Handler
-// app.use(globalErrorHandler);
+app.use(globalErrorHandler);
 
 export default app;
