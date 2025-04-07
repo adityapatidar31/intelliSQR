@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
-import catchAsync from "../utils/catchAsync";
+import bcrypt from "bcrypt";
 
-export const createUser = catchAsync(async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response) => {
   console.log(req.body);
   const { email, password } = req.body;
 
@@ -12,14 +12,17 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 
   if (existingUser) {
-    res.status(400).json({ message: "User already exists" });
+    res.status(401).json({
+      status: "error",
+      message: "user already exist",
+    });
     return;
   }
 
-  // TODO: Hash password later
+  const hashedPassword = await bcrypt.hash(password, 12);
   const user = await prisma.user.create({
-    data: { email, password },
+    data: { email, password: hashedPassword },
   });
 
   res.status(201).json({ user });
-});
+};
