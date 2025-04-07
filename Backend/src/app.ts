@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+import cors from "cors";
 
 import userRouter from "./routes/userRoutes";
 import { globalErrorHandler } from "./utils/globalErrorHandler";
@@ -9,6 +10,9 @@ const app = express();
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+// Enable CORS for all origins
+app.use(cors());
 
 app.use(
   express.json({

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,6 +5,8 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { signupSchema, SignupSchemaType } from "@/utils/schemas";
+import FormButton from "../FormButton";
+import { toast } from "react-toastify";
 
 const SignupPage = () => {
   const {
@@ -28,12 +29,11 @@ const SignupPage = () => {
       );
       return response.data;
     },
-    onSuccess: () => {
-      // TODO: redirect or show toast
-      console.log("Signup successful");
+    onSuccess: (data) => {
+      toast.success(data.message);
     },
     onError: (error) => {
-      console.error("Signup failed", error);
+      toast.error(error?.response?.data?.message);
     },
   });
 
@@ -109,9 +109,7 @@ const SignupPage = () => {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Creating..." : "Create Account"}
-          </Button>
+          <FormButton isPending={isPending}>Create Account</FormButton>
         </form>
 
         <div className="mt-4 text-center">

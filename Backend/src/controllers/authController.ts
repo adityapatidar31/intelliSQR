@@ -75,8 +75,14 @@ export const loginUser = catchAsync(
 export const signUpUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
-    const { email, password } = req.body;
+    const { email, password, confirmPassword } = req.body;
 
+    if (!email || !password || !confirmPassword) {
+      next(
+        new AppError("Email Password and confirm Password is required", 400)
+      );
+      return;
+    }
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
