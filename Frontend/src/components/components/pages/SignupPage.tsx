@@ -2,9 +2,13 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Link } from "react-router-dom";
-import { signupSchema, SignupSchemaType } from "@/utils/schemas";
+import {
+  errorResponseSchema,
+  signupSchema,
+  SignupSchemaType,
+} from "@/utils/schemas";
 import FormButton from "../FormButton";
 import { toast } from "react-toastify";
 
@@ -32,8 +36,17 @@ const SignupPage = () => {
     onSuccess: (data) => {
       toast.success(data.message);
     },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message);
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError;
+      const apiError = axiosError.response?.data;
+
+      const parsed = errorResponseSchema.safeParse(apiError);
+
+      if (parsed.success) {
+        toast.error(parsed.data.message);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     },
   });
 

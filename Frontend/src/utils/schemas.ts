@@ -20,3 +20,10 @@ export const loginSchema = z.object({
 });
 
 export type LoginSchemaType = z.infer<typeof loginSchema>;
+
+export const errorResponseSchema = z.object({
+  status: z.enum(["fail", "error"]),
+  message: z.string(),
+});
+
+export type ErrorResponseType = z.infer<typeof errorResponseSchema>;
