@@ -5,6 +5,7 @@ import { verifyPassword } from "../utils/helper";
 import { hashPassword } from "../utils/helper";
 import { AppError } from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
+import { emailOnlySchema } from "../validation/authSchema";
 
 interface User {
   email: string;
@@ -79,10 +80,22 @@ export const signUpUser = catchAsync(
 
     if (!email || !password || !confirmPassword) {
       next(
-        new AppError("Email Password and confirm Password is required", 400)
+        new AppError("Email, Password and confirm Password is required", 400)
       );
       return;
     }
+
+    if (password !== confirmPassword) {
+      next(new AppError("Password and confirm Password are not matching", 400));
+      return;
+    }
+
+    const parsed = emailOnlySchema.safeParse({ email });
+    if (!parsed.success) {
+      const message = parsed.error.errors[0].message;
+      return next(new AppError(message, 400));
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
