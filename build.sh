@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Navigate to the backend folder
-cd backend
+cd Backend
 
 # Install dependencies
 npm install
