@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { Link } from "react-router-dom";
 import {
   errorResponseSchema,
@@ -11,6 +11,7 @@ import {
 } from "@/utils/schemas";
 import FormButton from "../FormButton";
 import { toast } from "react-toastify";
+import { loginUser } from "@/utils/backend";
 
 const LoginPage = () => {
   const {
@@ -22,16 +23,7 @@ const LoginPage = () => {
   });
 
   const { mutate: login, isPending } = useMutation({
-    mutationFn: async (data: LoginSchemaType) => {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/users/login",
-        {
-          email: data.email,
-          password: data.password,
-        }
-      );
-      return response.data;
-    },
+    mutationFn: loginUser,
     onSuccess: (data) => {
       toast.success(data.message);
     },

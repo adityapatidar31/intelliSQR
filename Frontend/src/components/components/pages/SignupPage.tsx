@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { Link } from "react-router-dom";
 import {
   errorResponseSchema,
@@ -11,6 +11,7 @@ import {
 } from "@/utils/schemas";
 import FormButton from "../FormButton";
 import { toast } from "react-toastify";
+import { signUpUser } from "@/utils/backend";
 
 const SignupPage = () => {
   const {
@@ -22,17 +23,7 @@ const SignupPage = () => {
   });
 
   const { mutate: signup, isPending } = useMutation({
-    mutationFn: async (data: SignupSchemaType) => {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/users/signUp",
-        {
-          email: data.email,
-          password: data.password,
-          confirmPassword: data.confirmPassword,
-        }
-      );
-      return response.data;
-    },
+    mutationFn: signUpUser,
     onSuccess: (data) => {
       toast.success(data.message);
     },
