@@ -8,6 +8,8 @@
 
 ### ➤ SignUp API
 
+<<<<<<< HEAD
+
 - **URL:** `POST /api/v1/users/signUp`
 - **Request Body:**
   ```json
@@ -71,8 +73,8 @@
 - Express.js
 - TypeScript
 - Zod (Validation)
-- Prisma (if used)
-- JWT (if used)
+- Prisma
+- JWT
 
 ### Frontend:
 
